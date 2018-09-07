@@ -14,6 +14,13 @@ CREATE TABLE `cffpl`.`users` (
   `createddate` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `username_UNIQUE` (`username` ASC));
+  
+/* Create premierteams table */
+CREATE TABLE `cffpl`.`premierteams` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(100) NOT NULL,
+  PRIMARY KEY (`id`, `name`),
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC));
 
 /* Create premierplayers table */
 CREATE TABLE `cffpl`.`premierplayers` (
@@ -24,13 +31,6 @@ CREATE TABLE `cffpl`.`premierplayers` (
   `cost` DECIMAL(5, 2) NOT NULL,
   `position` VARCHAR(1) NOT NULL,
   PRIMARY KEY (`id`));
-  
-/* Create premierteams table */
-CREATE TABLE `cffpl`.`premierteams` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(100) NOT NULL,
-  PRIMARY KEY (`id`, `name`),
-  UNIQUE INDEX `name_UNIQUE` (`name` ASC));
  
  /* Create usersquads table */
  CREATE TABLE `cffpl`.`usersquads` (

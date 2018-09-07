@@ -52,4 +52,24 @@ class SquadSelectorDAO
 
     }
 
+    function submitSquad($_post, $session) {
+
+        $dbConnection = new DBConnection();
+        $connection = $dbConnection->getDatabaseConnection();
+
+        $session['userSquad'];
+        $session['currentSquadCost'];
+
+        // Translate this into team ids (or change the db so the name is the pk?)
+        // I.e. each player has an id, from which you get the team, and from the team can
+        // get the team name
+        $premierLeagueTeamsSelectedFrom = $session['premierLeagueTeamsSelectedFrom'];
+        die($session['userSquad']);
+
+
+        // Close the connection
+        $dbConnection->closeDatabaseConnection($connection);
+
+    }
+
 }

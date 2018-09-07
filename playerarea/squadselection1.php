@@ -46,7 +46,7 @@ if (isset($_POST['submit'])) {
         }
     } else if (isset($_POST['submit'])) {
             echo "Success";
-            $results = $validator->getGKSelectionForSession($_POST);
+            header("Location: squadselection2.php");
         } ?>
     <br>
         <form method="post" action="">
@@ -58,7 +58,7 @@ if (isset($_POST['submit'])) {
         foreach ($allGKs as $key => $valGK) { ?>
                 <tr>
                     <td>
-                        <input type="checkbox" name="player[]" value="<?php echo "$key" ?>">
+                        <input type="checkbox" name="player[]" value="<?php echo "$key". "&team="."$valGK[1]". "&cost="."$valGK[3]" ?>">
                     </td>
                     <td>
                         <?php echo "$valGK[0]" ?>

@@ -8,6 +8,7 @@ class PremierPlayer
     private$team = '';
     public$cost = 0.00;
     private$position = '';
+    private$points = 0;
 
     /**
      * @return int
@@ -87,5 +88,21 @@ class PremierPlayer
     public function setPosition($position)
     {
         $this->position = $position;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPoints()
+    {
+        return $this->points;
+    }
+
+    /**
+     * @param int $points
+     */
+    public function setPoints($points)
+    {
+        $this->points = $points;
     }
 }

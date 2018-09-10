@@ -16,11 +16,13 @@ if (!$username) {
 $squadSelector = new SquadSelectorDAO();
 $allGKs = $squadSelector->getAllSquadPlayersByPosition('D');
 
+$validator = new SquadSelectorValidator();
+
 // check that the form has been submitted
 if (isset($_POST['submit'])) {
 
     // Create a validator object that validates the defenders squad form submission
-    $validator = new SquadSelectorValidator();
+    // $validator = new SquadSelectorValidator();
     $errors = $validator->validateDefendersSquadForm($_POST, $_SESSION);
 }
 

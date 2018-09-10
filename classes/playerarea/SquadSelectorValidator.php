@@ -8,11 +8,22 @@ class SquadSelectorValidator
     private$MAX_SQUAD_COST = 100.00;
     //private$PREMIER_TEAMS = '';
     //private$PREMIER_PLAYERS = '';
+    private$userSquad = array();
+    private$premierLeagueTeamsSelectedFrom = array();
+    // private$currentUserSquadCost = array();
 
     function __construct()
     {
         //$this->PREMIER_TEAMS = PremierTeamLoader::getPremierLeagueTeams();
         // $this->PREMIER_PLAYERS = PremierPlayerLoader::getPremierPlayers();
+    }
+
+    function getUserSquad() {
+        return $this->userSquad;
+    }
+
+    function getPremierLeagueTeamsSelectedFrom() {
+        return $this->premierLeagueTeamsSelectedFrom;
     }
 
     /**
@@ -57,27 +68,29 @@ class SquadSelectorValidator
         }
 
         // Add the players selected so far for the squad into the squad array
-        $userSquad = array();
+        // $userSquad = array();
         foreach($post['player'] as $player) {
-            array_push($userSquad, $player);
+            array_push($this->userSquad, $player);
         }
 
         // Note, that at this stage no more than two squad members have been selected so cannot
         // have more than two players from the same Premier League team.
         // Add the two teams selected to an array and store in the session for later
-        $premierLeagueTeamsSelectedFrom = array();
-
         foreach($post['player'] as $player) {
 
             $team = substr($player, strpos($player, "team") + 5);
             $value = explode('&', $team , 2);
-            array_push($premierLeagueTeamsSelectedFrom, $value[0]);
+            array_push($this->premierLeagueTeamsSelectedFrom, $value[0]);
         }
 
         // Add the relevant variables to the session
-        $session['userSquad'] = $userSquad;
-        $session['currentSquadCost'] = $totalCost;
-        $session['premierLeagueTeamsSelectedFrom'] = $premierLeagueTeamsSelectedFrom;
+        //$session['userSquad'] = $userSquad;
+        // $session['currentSquadCost'] = $totalCost;
+        // $session['premierLeagueTeamsSelectedFrom'] = $this->premierLeagueTeamsSelectedFrom;
+        //die("2 premierLeagueTeamsSelectedFrom for session: ". var_dump($premierLeagueTeamsSelectedFrom).
+       //  " and for the session=". var_dump($session));
+        //echo "3=";
+        //die(var_dump($session));
 
     }
 
@@ -90,6 +103,9 @@ class SquadSelectorValidator
      * @return array
      */
     function validateDefendersSquadForm($post, $session) {
+
+        // echo "In validateDefendersSquadForm...";
+        // die(var_dump($session));
 
         // Validate that they have selected a maximum of 5 defenders
         $countSelected = 0;
@@ -110,9 +126,9 @@ class SquadSelectorValidator
         }
 
         // Add the players selected so far for the squad into the squad array
-        $userSquad = $session['userSquad'];
+        $this->userSquad = $session['userSquad'];
         foreach($post['player'] as $player) {
-            array_push($userSquad, $player);
+            array_push($this->userSquad, $player);
         }
 
         // Validate the cost of the squad to date does not exceed £100 million. This is
@@ -126,7 +142,6 @@ class SquadSelectorValidator
         foreach($post['player'] as $player) {
             $cost = substr($player, strpos($player, "=") + 1);
             $totalCost += $cost;
-
         }
 
         if (($totalCost + $currentSquadCost) > $this->MAX_SQUAD_COST) {
@@ -138,21 +153,24 @@ class SquadSelectorValidator
         // Validate that the current squad does not have more than two players from the same team.
         // Extract the premierLeagueTeamsSelectedFrom array from the session and add the teams that
         // relate to the defenders selected
-        $premierLeagueTeamsSelectedFrom = $session['premierLeagueTeamsSelectedFrom'];
+        $this->premierLeagueTeamsSelectedFrom = $session['premierLeagueTeamsSelectedFrom'];
+
+
+        // die("premierLeagueTeamsSelectedFrom: ". var_dump($premierLeagueTeamsSelectedFrom));
 
         foreach($post['player'] as $player) {
 
             $team = substr($player, strpos($player, "team") + 5);
             $value = explode('&', $team , 2);
-            array_push($premierLeagueTeamsSelectedFrom, $value[0]);
+            array_push($this->premierLeagueTeamsSelectedFrom, $value[0]);
         }
 
         // Get the teams that have just been added to the array and count to see if any number is greater than 2
-        $premierLeagueTeamsSelectedFromArray = array_count_values($premierLeagueTeamsSelectedFrom);
+        $premierLeagueTeamsSelectedFromArray = array_count_values($this->premierLeagueTeamsSelectedFrom);
 
         foreach ($premierLeagueTeamsSelectedFromArray as $key => $numberOfTimesTeamSelected) {
             if ($numberOfTimesTeamSelected > 2) {
-                $validationErrors[] = "The total number of players from  "+ $key.
+                $validationErrors[] = "The total number of players from  "+ $numberOfTimesTeamSelected.
                     " exceeds the maximum number of two. Only two players from the same Premier League can be ".
                 " selected for the squad.";
                 return $validationErrors;
@@ -160,9 +178,9 @@ class SquadSelectorValidator
         }
 
         // Add the relevant variables to the session
-        $session['userSquad'] = $userSquad;
-        $session['currentSquadCost'] = $totalCost;
-        $session['premierLeagueTeamsSelectedFrom'] = $premierLeagueTeamsSelectedFrom;
+        //$session['userSquad'] = $userSquad;
+        //$session['currentSquadCost'] = $totalCost;
+        //$session['premierLeagueTeamsSelectedFrom'] = $premierLeagueTeamsSelectedFrom;
     }
 
     /**
@@ -208,9 +226,10 @@ class SquadSelectorValidator
 
         $totalCost = 0;
         foreach($post['player'] as $player) {
-            $cost = substr($player, strpos($player, "=") + 1);
-            $totalCost += $cost;
 
+            $team = substr($player, strpos($player, "team") + 5);
+            $value = explode('&', $team , 2);
+            array_push($premierLeagueTeamsSelectedFrom, $value[0]);
         }
 
         if (($totalCost + $currentSquadCost) > $this->MAX_SQUAD_COST) {

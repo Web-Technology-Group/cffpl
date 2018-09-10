@@ -16,11 +16,13 @@ if (!$username) {
 $squadSelector = new SquadSelectorDAO();
 $allGKs = $squadSelector->getAllSquadPlayersByPosition('G');
 
+$validator = new SquadSelectorValidator();
+
 // check that the form has been submitted
 if (isset($_POST['submit'])) {
 
     // Create a validator object that validates the goalkeeping squad form submission
-    $validator = new SquadSelectorValidator();
+    // $validator = new SquadSelectorValidator();
     $errors = $validator->validateGKSquadForm($_POST, $_SESSION);
 }
 
@@ -46,6 +48,8 @@ if (isset($_POST['submit'])) {
         }
     } else if (isset($_POST['submit'])) {
             echo "Success";
+            $_SESSION['userSquad'] = $validator->getUserSquad();
+            $_SESSION['premierLeagueTeamsSelectedFrom'] = $validator->getPremierLeagueTeamsSelectedFrom();
             header("Location: squadselection2.php");
         } ?>
     <br>

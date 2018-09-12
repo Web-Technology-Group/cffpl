@@ -1,8 +1,11 @@
-<!-- The login page for the CFFPL application -->
 <?php
 
-require_once('classes\playerarea\LoginFormValidator.php');
-require_once('classes\playerarea\LoginDAOValidator.php');
+namespace Login;
+
+use Com\PlayerArea\Validation;
+
+require_once('classes\com\playerarea\validation\LoginFormValidator.php');
+require_once('classes\com\playerarea\validation\LoginDAOValidator.php');
 
 // Reset the fields
 $username = '';
@@ -16,8 +19,7 @@ if (isset($_POST['submit'])) {
     $password = $_POST['password'];
 
     // Create a validator object that validates the login form
-    $validator = new LoginFormValidator();
-    $errors = $validator->validateLoginForm($_POST);
+    $errors = Validation\LoginFormValidator::validateLoginForm($_POST);
 }
 ?>
 
@@ -32,6 +34,7 @@ if (isset($_POST['submit'])) {
 
     <?php
     if (!empty($errors)) {
+
         foreach ($errors as $key => $error) { ?>
             <p style="color:red"><?php echo $error ?></p>
             <?php
@@ -39,8 +42,7 @@ if (isset($_POST['submit'])) {
     } else if (isset($_POST['submit'])) {
 
         // Check if the user login credentials are valid
-        $loginDAOValidator = new LoginDAOValidator();
-        $isLoginValid = $loginDAOValidator->isLoginValid($_POST);
+        $isLoginValid = Validation\LoginDAOValidator::isLoginValid($_POST);
 
         if ($isLoginValid != true) { ?>
             <p style="color:red">

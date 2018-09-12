@@ -1,8 +1,11 @@
-<!-- The registration page for the CFFPL application -->
 <?php
 
-require_once('classes\playerarea\RegistrationFormValidator.php');
-require_once('classes\playerarea\RegistrationDAOValidator.php');
+namespace Registration;
+
+use Com\PlayerArea\Validation;
+
+require_once('classes\com\playerarea\validation\RegistrationFormValidator.php');
+require_once('classes\com\playerarea\validation\RegistrationDAOValidator.php');
 
     // Reset the fields
     $username = '';
@@ -23,9 +26,8 @@ require_once('classes\playerarea\RegistrationDAOValidator.php');
         $middlename = $_POST['middlename'];
         $surname = $_POST['surname'];
 
-        // Create a validator object that validates the registration form
-        $validator = new RegistrationFormValidator();
-        $errors = $validator->validateRegistrationForm($_POST);
+        // Validate the registration form
+        $errors = Validation\RegistrationFormValidator::validateRegistrationForm($_POST);
     }
 ?>
 
@@ -47,8 +49,7 @@ if (!empty($errors)) {
     } else if (isset($_POST['submit'])) {
 
             // Check if the user has already registered
-            $registrationDAOValidator = new RegistrationDAOValidator();
-            $isDuplicateUser = $registrationDAOValidator->isDuplicateUser($_POST['username']);
+            $isDuplicateUser = Validation\RegistrationDAOValidator::isDuplicateUser($_POST['username']);
 
             if ($isDuplicateUser == true) { ?>
                 <p style="color:red">
@@ -58,7 +59,7 @@ if (!empty($errors)) {
             <?php
             } else {
                 // Insert the new entry into the database
-                $result = $registrationDAOValidator->insertRegisteredUser($_POST);
+                $result = Validation\RegistrationDAOValidator::insertRegisteredUser($_POST);
                 if ($result === true) {
                     // Success
                     // The user has successfully registered so forward them to the login page so they can log in

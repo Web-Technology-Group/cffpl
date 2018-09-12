@@ -1,8 +1,11 @@
-<!-- squad selection 1 (Goalkeepers) -->
 <?php
 
-require_once('..\classes\playerarea\SquadSelectorDAO.php');
-require_once('..\classes\playerarea\SquadSelectorValidator.php');
+namespace PlayerArea;
+
+use Com\PlayerArea\Validation;
+
+require_once('..\classes\com\playerarea\SquadSelectorDAO.php');
+require_once('..\classes\com\playerarea\SquadSelectorValidator.php');
 
 session_start();
 $username = $_SESSION['username'];
@@ -13,17 +16,16 @@ if (!$username) {
     header('Location: ../login.php');
 }
 
-$squadSelector = new SquadSelectorDAO();
+$squadSelector = new Validation\SquadSelectorDAO();
 $allGKs = $squadSelector->getAllSquadPlayersByPosition('G');
 
-$validator = new SquadSelectorValidator();
+$validator = new Validation\SquadSelectorValidator();
 
 // check that the form has been submitted
 if (isset($_POST['submit'])) {
 
     // Create a validator object that validates the goalkeeping squad form submission
-    // $validator = new SquadSelectorValidator();
-    $errors = $validator->validateGKSquadForm($_POST, $_SESSION);
+    $errors = $validator->validateGKSquadForm($_POST);
 }
 
 ?>
@@ -35,7 +37,7 @@ if (isset($_POST['submit'])) {
     <title>CFFPL - Player Area - Goalkeepers Squad Selection</title>
 </head>
 <body>
-
+<br>
     <h4>Please only select two goalkeepers for the squad, <?php echo $username ?></h4>
 
     <!-- Insert rules of the squad selection using an include file -->
@@ -47,9 +49,6 @@ if (isset($_POST['submit'])) {
     <?php
         }
     } else if (isset($_POST['submit'])) {
-            echo "Success";
-            $_SESSION['userSquad'] = $validator->getUserSquad();
-            $_SESSION['premierLeagueTeamsSelectedFrom'] = $validator->getPremierLeagueTeamsSelectedFrom();
             header("Location: squadselection2.php");
         } ?>
     <br>

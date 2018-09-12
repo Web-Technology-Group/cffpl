@@ -1,4 +1,3 @@
-<!-- squad selection submit -->
 <?php
 
 require_once('..\classes\playerarea\SquadSelectorDAO.php');
@@ -27,7 +26,7 @@ if (isset($_POST['squadSubmit'])) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>CFFPL - Player Area - Squad Submission</title>
+    <title>CFFPL - Player Area - Squad Se</title>
 </head>
 <body>
 

@@ -1,8 +1,11 @@
-<!-- squad selection 2 (Defenders) -->
 <?php
 
-require_once('..\classes\playerarea\SquadSelectorDAO.php');
-require_once('..\classes\playerarea\SquadSelectorValidator.php');
+namespace PlayerArea;
+
+use Com\PlayerArea\Validation;
+
+require_once('..\classes\com\playerarea\SquadSelectorDAO.php');
+require_once('..\classes\com\playerarea\SquadSelectorValidator.php');
 
 session_start();
 $username = $_SESSION['username'];
@@ -13,17 +16,19 @@ if (!$username) {
     header('Location: ../login.php');
 }
 
-$squadSelector = new SquadSelectorDAO();
+$squadSelector = new Validation\SquadSelectorDAO();
 $allGKs = $squadSelector->getAllSquadPlayersByPosition('D');
 
-$validator = new SquadSelectorValidator();
+$validator = new Validation\SquadSelectorValidator();
+
+$userSquad = $_SESSION['userSquad'];
+$currentSquadCost = $_SESSION['currentSquadCost'];
 
 // check that the form has been submitted
 if (isset($_POST['submit'])) {
 
     // Create a validator object that validates the defenders squad form submission
-    // $validator = new SquadSelectorValidator();
-    $errors = $validator->validateDefendersSquadForm($_POST, $_SESSION);
+    $errors = $validator->validateDefendersSquadForm($_POST);
 }
 
 ?>
@@ -35,7 +40,7 @@ if (isset($_POST['submit'])) {
     <title>CFFPL - Player Area - Defenders Squad Selection</title>
 </head>
 <body>
-
+<br>
     <h4>Please only select five defenders for the squad, <?php echo $username ?></h4>
 
     <!-- Insert rules of the squad selection using an include file -->
@@ -47,9 +52,11 @@ if (isset($_POST['submit'])) {
     <?php
         }
     } else if (isset($_POST['submit'])) {
-            echo "Success";
             header("Location: squadselection3.php");
         } ?>
+    <br>
+    <h3>Current squad value: £<?php echo "$currentSquadCost" ?>m</h3><br>
+    <br>
     <br>
         <form method="post" action="">
             <table>

@@ -1,8 +1,11 @@
-<!-- squad selection 2 (Midfielders) -->
 <?php
 
-require_once('..\classes\playerarea\SquadSelectorDAO.php');
-require_once('..\classes\playerarea\SquadSelectorValidator.php');
+namespace PlayerArea;
+
+use Com\PlayerArea\Validation;
+
+require_once('..\classes\com\playerarea\SquadSelectorDAO.php');
+require_once('..\classes\com\playerarea\SquadSelectorValidator.php');
 
 session_start();
 $username = $_SESSION['username'];
@@ -13,15 +16,19 @@ if (!$username) {
     header('Location: ../login.php');
 }
 
-$squadSelector = new SquadSelectorDAO();
+$squadSelector = new Validation\SquadSelectorDAO();
 $allGKs = $squadSelector->getAllSquadPlayersByPosition('M');
+
+// Get the stauts so far
+$currentSquadCost = $_SESSION['currentSquadCost'];
+$userSquad = $_SESSION['userSquad'];
 
 // check that the form has been submitted
 if (isset($_POST['submit'])) {
 
     // Create a validator object that validates the midfielders squad form submission
-    $validator = new SquadSelectorValidator();
-    $errors = $validator->validateMidfieldersSquadForm($_POST, $_SESSION);
+    $validator = new Validation\SquadSelectorValidator();
+    $errors = $validator->validateMidfieldersSquadForm($_POST);
 }
 
 ?>
@@ -33,11 +40,12 @@ if (isset($_POST['submit'])) {
     <title>CFFPL - Player Area - Midfielders Squad Selection</title>
 </head>
 <body>
-
 <h4>Please only select five midfielders for the squad, <?php echo $username ?></h4>
-
+<br>
 <!-- Insert rules of the squad selection using an include file -->
 <?php include 'competitionrules.html';?>
+<br>
+<h3>Current squad value: £<?php echo "$currentSquadCost" ?>m</h3><br>
 <?php
 if (!empty($errors)) {
     foreach ($errors as $key => $error) { ?>

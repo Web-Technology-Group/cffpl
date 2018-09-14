@@ -17,15 +17,15 @@ if (!$username) {
 }
 
 $teamSelector = new Validation\TeamSelectorDAO();
-$allGKs = $teamSelector->getAllTeamPlayersByPosition('G', $username);
+$allMidfielders = $teamSelector->getAllTeamPlayersByPosition('M', $username);
 
 $validator = new Validation\TeamSelectorValidator();
 
 // check that the form has been submitted
 if (isset($_POST['submit'])) {
 
-    // Create a validator object that validates the goalkeeping team form submission
-    $errors = $validator->validateGKTeamForm($_POST);
+    // Create a validator object that validates the midfielders squad form submission
+    $errors = $validator->validateMidfieldersTeamForm($_POST);
 }
 
 ?>
@@ -34,11 +34,11 @@ if (isset($_POST['submit'])) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>CFFPL - Player Area - Goalkeeper Team Selection</title>
+    <title>CFFPL - Player Area - Midfielders Team Selection</title>
 </head>
 <body>
 <br>
-<h4>Please only select one goalkeepers for the team, <?php echo $username ?></h4>
+<h4>Please only select four midfielders for the team, <?php echo $username ?></h4>
 
 <!-- Insert rules of the squad selection using an include file -->
 <?php include 'competitionrules.html';?>
@@ -49,7 +49,7 @@ if (!empty($errors)) {
         <?php
     }
 } else if (isset($_POST['submit'])) {
-    header("Location: teamselection2.php");
+    header("Location: teamselection4.php");
 } ?>
 <br>
 <form method="post" action="">
@@ -58,19 +58,19 @@ if (!empty($errors)) {
             <td>Select</td><td>Player</td><td>Team</td><td>Points</td>
         </tr>
         <?php
-        foreach ($allGKs as $key => $valGK) { ?>
+        foreach ($allMidfielders as $key => $valMid) { ?>
         <tr>
             <td>
                 <input type="checkbox" name="player[]" value="<?php echo "$key" ?>">
             </td>
             <td>
-                <?php echo "$valGK[0]" ?>
+                <?php echo "$valMid[0]" ?>
             </td>
             <td>
-                <?php echo "$valGK[1]" ?>
+                <?php echo "$valMid[1]" ?>
             </td>
             <td>
-                <?php echo "$valGK[2]" ?><br>
+                <?php echo "$valMid[2]" ?><br>
             </td>
         </tr>
     </table>
@@ -78,7 +78,7 @@ if (!empty($errors)) {
     }
     ?>
     <br>
-    <input type="submit" name="submit" value="Submit Goalkeeper">
+    <input type="submit" name="submit" value="Submit Midfielders">
 </form>
 </body>
 </html>

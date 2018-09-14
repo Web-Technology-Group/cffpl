@@ -32,6 +32,8 @@ $isSquadSelected = $squadSelector->isSquadSelected($username);
     <br>
     <h5><?php if (!$isSquadSelected) { ?>
             <a href="squadselection1.php">Select Squad</a>
+        <?php   } else { ?>
+            <a href="teamselection1.php">Select Team</a>
         <?php   } ?></h5>
     <br>
     <h5><a href="../logout.php">Logout</a></h5>

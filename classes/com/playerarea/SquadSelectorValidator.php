@@ -4,12 +4,10 @@ namespace Com\PlayerArea\Validation;
 
 class SquadSelectorValidator
 {
-    //private $validationErrors = array();
     private $MAX_SQUAD_COST = 50.00;
     private $userSquad = array();
     private $premierLeagueTeamsSelectedFrom = array();
     private $currentSquadCost = 0;
-
 
     /**
      *  Validate the Goalkeepers squad form. This should ensure that only two goalkeepers have been selected,

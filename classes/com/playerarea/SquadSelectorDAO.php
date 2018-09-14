@@ -69,45 +69,18 @@ class SquadSelectorDAO
 
             if ($row = $statement->fetch()) {
 
-                $insertStatement = $dbPDOConnection->prepare("INSERT INTO usersquads (userid, playerid) VALUES (?, ?) ");
-                echo "2=In loop=". $row[0] ."<br>";
+                $insertStatement = $dbPDOConnection->prepare(
+                    "INSERT INTO usersquads (userid, playerid) VALUES (?, ?) ");
 
                 // Begin the insert process
                 foreach ($playerids as $playerid) {
                     $insertStatement->execute([$row[0], $playerid]);
-                    echo "3=In loop=". $playerid ."<br>";
                 }
             }
 
         } catch (\PDOException $e) {
             die("PDO Exception=" . $e->getMessage());
         }
-
-
-        /*  foreach ($userSquad as $id) {
-             echo "The id is: ". $id. " <br>";
-         } */
-
-
-        // $_SESSION['currentSquadCost'];
-
-        // $_SESSION['username']
-
-        /**  $dbPDOConnection $dbPDOConnection = Database\DBConnection::getPDOInstance();
-         *
-         * $session['userSquad'];
-         * $session['currentSquadCost'];
-         *
-         * // Translate this into team ids (or change the db so the name is the pk?)
-         * // I.e. each player has an id, from which you get the team, and from the team can
-         * // get the team name
-         * $premierLeagueTeamsSelectedFrom = $session['premierLeagueTeamsSelectedFrom'];
-         * die($session['userSquad']);
-         *
-         *
-         * // Close the connection
-         * $dbConnection->closeDatabaseConnection($connection); */
-
     }
 
 }

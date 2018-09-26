@@ -10,7 +10,7 @@ class TeamSelectorValidator
     /**
      * @param $post
      */
-    function validateGKTeamForm($post) {
+    public function validateGKTeamForm($post) {
 
         session_start();
 
@@ -44,7 +44,7 @@ class TeamSelectorValidator
     /**
      * @param $post
      */
-    function validateDefendersTeamForm($post) {
+    public function validateDefendersTeamForm($post) {
 
         session_start();
 
@@ -79,7 +79,7 @@ class TeamSelectorValidator
     /**
      * @param $post
      */
-    function validateMidfieldersTeamForm($post) {
+    public function validateMidfieldersTeamForm($post) {
 
         session_start();
 
@@ -114,7 +114,7 @@ class TeamSelectorValidator
     /**
      * @param $post
      */
-    function validateAttackersTeamForm($post) {
+    public function validateAttackersTeamForm($post) {
 
         session_start();
 

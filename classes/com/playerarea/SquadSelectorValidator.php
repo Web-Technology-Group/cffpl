@@ -17,7 +17,7 @@ class SquadSelectorValidator
      * @param $session
      * @return array
      */
-    function validateGKSquadForm($post) {
+    public function validateGKSquadForm($post) {
 
         session_start();
 
@@ -84,7 +84,7 @@ class SquadSelectorValidator
      * @param $session
      * @return array
      */
-    function validateDefendersSquadForm($post) {
+    public function validateDefendersSquadForm($post) {
 
         session_start();
 
@@ -186,7 +186,7 @@ class SquadSelectorValidator
      * @param $session
      * @return array
      */
-    function validateMidfieldersSquadForm($post) {
+    public function validateMidfieldersSquadForm($post) {
 
         session_start();
 
@@ -285,7 +285,7 @@ class SquadSelectorValidator
      * @param $session
      * @return array
      */
-    function validateAttackersSquadForm($post) {
+    public function validateAttackersSquadForm($post) {
 
         session_start();
 

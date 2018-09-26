@@ -6,11 +6,21 @@ use Com\PlayerArea\Database;
 
 require_once('database\DBConnection.php');
 
+/**
+ * Class that encapsulates logic regarding the selection and submission of a user's squad.
+ *
+ * Class SquadSelectorDAO
+ * @package Com\PlayerArea\Validation
+ */
 class SquadSelectorDAO
 {
-    function isSquadSelected($username)
+    /**
+     * Determine whether the user has selected their squad.
+     * @param $username
+     * @return bool
+     */
+    public function isSquadSelected($username)
     {
-
         $result = false;
 
         $dbPDOConnection = Database\DBConnection::getPDOInstance();
@@ -26,15 +36,32 @@ class SquadSelectorDAO
         return $result;
     }
 
-    function getAllSquadPlayersByPosition($position)
+    /**
+     * Get all the squad players by position. For now this defaults to the latest week only
+     * @param $position
+     * @param null $week
+     * @param bool $latestWeek
+     * @return array
+     */
+    public function getAllSquadPlayersByPosition($position, $week = null, $latestWeek = true)
     {
-
         $allSquadGKs = array();
 
         $dbPDOConnection = Database\DBConnection::getPDOInstance();
 
+        // First establish what the latest week is
+        $statement = $dbPDOConnection->query("SELECT MAX(week) FROM weeklyhistory");
+        $maxWeekValue = 0;
+        while ($row = $statement->fetch()) {
+            $maxWeekValue = $row[0];
+
+            // Now plug that MAX week value into the main SQL query so that we get the fields
+            // from premierplayers only for the relevant position and for the given week (to avoid duplicate
+            // players being returned)
+        }
+
         $statement = $dbPDOConnection->query(
-            "SELECT id, name, team, points, cost FROM premierplayers WHERE position = '$position'");
+            "SELECT id, name, team, points, cost FROM premierplayers WHERE position = '$position' AND week = '$maxWeekValue'");
 
         // Build the result array to contain the relevant fields used in the front end
         while ($row = $statement->fetch()) {
@@ -46,7 +73,11 @@ class SquadSelectorDAO
 
     }
 
-    function submitSquad($username)
+    /**
+     * Submit the squad selected
+     * @param $username
+     */
+    public function submitSquad($username)
     {
 
         session_start();
@@ -79,7 +110,7 @@ class SquadSelectorDAO
             }
 
         } catch (\PDOException $e) {
-            die("PDO Exception=" . $e->getMessage());
+            echo "An exception has occurred. ". $e->getMessage(). ". Please notify the help desk.";
         }
     }
 

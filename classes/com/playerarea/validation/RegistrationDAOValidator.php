@@ -6,6 +6,12 @@ use Com\PlayerArea\Database;
 
 require_once('classes\com\playerarea\database\DBConnection.php');
 
+/**
+ * Class that contain methods that checks for already existing users and the actual creation of the user account.
+ *
+ * Class RegistrationDAOValidator
+ * @package Com\PlayerArea\Validation
+ */
 class RegistrationDAOValidator
 {
     public static function isDuplicateUser($username) {

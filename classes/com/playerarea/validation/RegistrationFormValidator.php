@@ -2,6 +2,12 @@
 
 namespace Com\PlayerArea\Validation;
 
+/**
+ * Class that contains methods that validate a user's registration form
+ *
+ * Class RegistrationFormValidator
+ * @package Com\PlayerArea\Validation
+ */
 class RegistrationFormValidator
 {
     /**
@@ -93,8 +99,6 @@ class RegistrationFormValidator
         }
 
         return $validationErrors;
-
-
     }
 
 

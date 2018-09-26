@@ -6,20 +6,46 @@ use Com\PlayerArea\Database;
 
 require_once('database\DBConnection.php');
 
-
+/**
+ * Class responsible for the selection and submission of a user's team
+ *
+ * Class TeamSelectorDAO
+ * @package Com\PlayerArea\Validation
+ */
 class TeamSelectorDAO
 {
-    function getAllTeamPlayersByPosition($position, $username) {
+    /**
+     * Get all the team players within the squad by position. For now this defaults to the latest week only
+     * @param $position
+     * @param $username
+     * @return array
+     */
+    public function getAllTeamPlayersByPosition($position, $username) {
 
         $allAvailableTeamPlayers = array();
 
         $dbPDOConnection = Database\DBConnection::getPDOInstance();
 
+        /* // This should ideally be incorporated in the SQL queries run..
+        $statement = $dbPDOConnection->query("SELECT MAX(week) FROM premierplayers");
+        $maxWeekValue = 0;
+        while ($row = $statement->fetch()) {
+            $maxWeekValue = $row[0];
+
+            // Now plug that MAX week value into the main SQL query so that we get the fields
+            // from premierplayers only for the relevant position and for the given week (to avoid duplicate
+            // players being returned)
+        } */
+
         try {
+            // For now revert to just the values for week 1 - even though the points will not be the most up to date
+            // In an ideal scenario, it would establish what the latest week is, and plug that max week value into
+            // into the main SQL query so that we get the field from premierplayers only for the relevant position
+            // and for the given week (to avoid duplicate players being returned)
             $statement = $dbPDOConnection->query(
                 "SELECT pp.id, pp.name, pp.team, pp.points FROM premierplayers pp, usersquads us, users u ".
                         "WHERE position = '$position' AND pp.id = us.playerid AND u.id = us.userid".
-                        " AND u.username ='$username'");
+                        " AND u.username ='$username' AND pp.week = 1");
 
             // Build the result array to contain the relevant fields used in the front end
             while ($row = $statement->fetch()) {
@@ -30,11 +56,16 @@ class TeamSelectorDAO
             return $allAvailableTeamPlayers;
 
             } catch (\PDOException $e) {
-            die("PDO Exception=" . $e->getMessage());
+            echo "An exception has occurred. ". $e->getMessage(). ". Please notify the help desk.";
         }
     }
 
-    function submitTeam($username)
+    /**
+     * Submit the team selected by the user
+     *
+     * @param $username
+     */
+    public function submitTeam($username)
     {
 
         session_start();
@@ -44,30 +75,22 @@ class TeamSelectorDAO
 
         try {
             $userTeam = $_SESSION['userTeam'];
-            //die("The first id is=".$userTeam[0]);
-            /* // Firstly, simply deselect every member of the team for that user
+            // Firstly, simply deselect every member of the team for that user
             $insertStatement = $dbPDOConnection->prepare(
             "UPDATE usersquads  us, users u SET us.inteam = 0  WHERE us.userid = u.id ".
                 "AND u.username = '$username'");
-            $insertStatement->execute(); */
+            $insertStatement->execute();
 
-            $in  = str_repeat('?,', count($userTeam) - 1) . '?';
-            $sql = "UPDATE usersquads us, users u SET us.inteam = 1 WHERE us.userid = u.id AND u.username = '$username' AND us.playerid IN('$in')";
-            $stm = $dbPDOConnection->prepare($sql);
-            $stm->execute($userTeam);
-
-
-            /* // Then, submit the new team
-            /$insertStatement2 = $dbPDOConnection->prepare(
-                "UPDATE usersquads us, users u SET us.inteam = 1 WHERE us.userid = u.id ".
-                "AND u.username = '$username' AND us.playerid IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $insertStatement2->execute(
-                $userTeam[0], $userTeam[1], $userTeam[2], $userTeam[3],
-                $userTeam[4], $userTeam[5], $userTeam[6], $userTeam[7], $userTeam[8], $userTeam[9], $userTeam[10]); */
-            die("Row count affected by an update=" .$stm->rowCount());
+            // Note, you cannot bind multiple values to a single named parameter in,
+            // for example, the IN() clause of an SQL statement. This appears to be the only alternative
+            foreach ($userTeam as $key => $playerId) {
+                $sql = "UPDATE usersquads us, users u SET us.inteam = 1 WHERE us.userid = u.id AND u.username = ? AND us.playerid = ?";
+                $stm = $dbPDOConnection->prepare($sql);
+                $stm->execute([$username, $playerId]);
+            }
 
         } catch (\PDOException $e) {
-            die("PDO Exception=" . $e->getMessage());
+            echo "An exception has occurred. ". $e->getMessage(). ". Please notify the help desk.";
         }
     }
 }

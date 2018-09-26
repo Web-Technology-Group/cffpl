@@ -6,6 +6,12 @@ use Com\PlayerArea\Database;
 
 require_once('classes\com\playerarea\database\DBConnection.php');
 
+/**
+ * Class that helps ascertains whether the user credentials to login are valid
+ *
+ * Class LoginDAOValidator
+ * @package Com\PlayerArea\Validation
+ */
 class LoginDAOValidator
 {
     /**
@@ -28,7 +34,7 @@ class LoginDAOValidator
             }
 
         } catch (\PDOException $e) {
-            die("PDO Exception=". $e->getMessage());
+            echo "An exception has occurred. ". $e->getMessage(). ". Please notify the help desk.";
         }
     }
 }

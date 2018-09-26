@@ -1,7 +1,15 @@
-/** CFFPL Database Creation Script **/
+/* CFFPL Database Creation Script */
 CREATE DATABASE cffpl;
 
 USE cffpl;
+
+/* Create weeklyhistory table */
+CREATE TABLE `cffpl`.`weeklyhistory` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `week` INT NOT NULL,
+  `weekstarttime` DATETIME NULL,
+  `weekendtime` DATETIME NULL,
+  PRIMARY KEY (`id`));
 
 /* Create users table */
 CREATE TABLE `cffpl`.`users` (
@@ -30,7 +38,9 @@ CREATE TABLE `cffpl`.`premierplayers` (
   `points` INT NOT NULL DEFAULT 0,
   `cost` DECIMAL(5, 2) NOT NULL,
   `position` VARCHAR(1) NOT NULL,
-  PRIMARY KEY (`id`));
+  `week` INT NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (week) REFERENCES weeklyhistory(id));
  
  /* Create usersquads table */
  CREATE TABLE `cffpl`.`usersquads` (

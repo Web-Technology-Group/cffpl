@@ -1,6 +1,6 @@
 <?php
 
-namespace Com\PlayerArea\Validation;
+namespace Com\PlayerArea;
 
 use Com\PlayerArea\Database;
 
@@ -15,6 +15,27 @@ require_once('database\DBConnection.php');
  */
 class CalculationEngine
 {
+    /**
+     * Find the corresponding player points total in the $latestWeekPlayerScores. In other words if the player names and
+     * team match then return the corresponding player points total
+     * @param $latestWeekPlayerScores
+     * @param $playerName
+     * @param $team
+     */
+    private function findPlayerPointsTotal($latestWeekPlayerScores, $playerName, $team) {
+
+        foreach ($latestWeekPlayerScores as $id => $playerInfo) {
+            // Name, team, points: $row[1], $row[2], $row[3]);
+            $latestPlayerName = $playerInfo[0];
+            $latestTeam = $playerInfo[1];
+            if (($playerName == $latestPlayerName) && ($team == $latestTeam) ) {
+                // We have a match so return the points value
+                return $playerInfo[2];
+            }
+        }
+    }
+
+
     /**
      * Calculate the weekly user score given the team that were selected
      * @param $username
@@ -56,7 +77,7 @@ class CalculationEngine
                     "WHERE us.inteam = 1 ".
                     "AND pp.id = us.playerid ".
                     "AND u.id = us.userid ".
-                    " AND u.username ='$username' AND pp.week = '$latestWeek'");
+                    " AND u.username ='$username' AND pp.week = '$maxWeekValue'");
 
                 while ($row = $statement->fetch()) {
 
@@ -77,12 +98,14 @@ class CalculationEngine
                 //AND u.username ='mark.lupine@civica.co.uk'
                 //AND pp.week = '2';
 
-                $weeklyPointsTotal = 0;
+                $weeklyPointsTotalForPlayer = 0;
+                $previousWeek = $maxWeekValue - 1;
+                $userWeeklyScoreGrandTotal = 0;
                 foreach ($latestWeekPlayerScores as $id => $nameTeamPoints) {
-                    // The player name
+                    // The player's name
                     $playerName = $nameTeamPoints[0];
 
-                    // The player team
+                    // The player's team
                     $team = $nameTeamPoints[1];
 
                     // The points total for that player
@@ -91,13 +114,30 @@ class CalculationEngine
                     // Get the number of points for that particular player for the previous week
                     $selectStatement = $dbPDOConnection->query(
                         "SELECT DISTINCT pp.points, FROM premierplayers pp, usersquads us, users u ".
-                                  "WHERE pp.name = 'Vietto'");
+                                  "WHERE pp.name = ? AND  pp.team = ? AND u.id = us.userid AND u.username = ? ".
+                                  "AND pp.week = ?");
+
+                    $selectStatement->execute([$playerName, $team, $username, $previousWeek]);
+
+                    // Get the value from the statement and work out the previous value
+                    while ($row = $selectStatement->fetch()) {
+                        $previousWeekPointsScore = $row[0]; // The points total for the previous week
+
+                        // The total for the latest/requested week
+                        $latestPointsScoreForPlayer =
+                            $this->findPlayerPointsTotal($latestWeekPlayerScores, $playerName, $team);
+
+                        // The point change is therefore the latest points score minus the previous
+                        // weeks points score
+                        $weeklyPointsTotalForPlayer = $latestPointsScoreForPlayer - $previousWeekPointsScore;
+
+                        // Add this to the grand total weekly score i.e. the combined weekly score for those
+                        // selected players in the team
+                        $userWeeklyScoreGrandTotal += $weeklyPointsTotalForPlayer;
+                    }
                 }
 
-                // Find the players selected for that week (i.e. the required week, if specified, or the latest one)
-                // The premierplayers weekly scores can already be deduced (week 2 score for player minus -
-                // week 1 score for player) For each player in the team add the weekly points score to the
-                // total user score for that week
+                return $userWeeklyScoreGrandTotal;
             }
         }
 

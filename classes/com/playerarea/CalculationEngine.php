@@ -35,14 +35,13 @@ class CalculationEngine
         }
     }
 
-
     /**
      * Calculate the weekly user score given the team that were selected
      * @param $username
      * @param null $week
      * @param bool $latestWeek
      */
-    public function calculateWeeklyUserScore($username, $week = null, $latestWeek = true) {
+    public static function calculateWeeklyUserScore($username, $week = null, $latestWeek = true) {
 
         // If the week is set then take that given integer value and find out the difference between
         // that week and the previous week's score
@@ -125,7 +124,7 @@ class CalculationEngine
 
                         // The total for the latest/requested week
                         $latestPointsScoreForPlayer =
-                            $this->findPlayerPointsTotal($latestWeekPlayerScores, $playerName, $team);
+                            CalculationEngine::findPlayerPointsTotal($latestWeekPlayerScores, $playerName, $team);
 
                         // The point change is therefore the latest points score minus the previous
                         // weeks points score
@@ -144,5 +143,42 @@ class CalculationEngine
 
     }
 
+    /**
+     * Get the leaderboard which calculates the sum of all user weekly scores
+     */
+    public static function getLeaderboard() {
 
+        $dbPDOConnection = Database\DBConnection::getPDOInstance();
+        $selectStatement = $dbPDOConnection->query(
+            "SELECT u.username, FORMAT(SUM(weekpointstotal), 2) AS total FROM userweeklyscores uws, users u ".
+            "WHERE uws.userid = u.id ".
+            "GROUP BY username ".
+            "ORDER BY FORMAT(SUM(weekpointstotal), 2) DESC");
+
+        $leaderboard = array();
+        while ($row = $selectStatement->fetch()) {
+            $row[0]; // total points
+            $row[1]; // username
+
+            $leaderboard[$row[1]] = $row[0];
+        }
+
+        return $leaderboard;
+    }
+
+
+    public function generateAllUserWeeklyScores() {
+
+        // For each user in the system calculate the weekly scores
+        $dbPDOConnection = Database\DBConnection::getPDOInstance();
+
+        $selectStatement = $dbPDOConnection->query("SELECT username FROM users");
+        while ($row = $selectStatement->fetch()) {
+            $username = row[0]; // username
+            $weeklyScoreArray = calculateWeeklyUserScore($username, $week = null, $latestWeek = true);
+
+        }
+
+
+    }
 }

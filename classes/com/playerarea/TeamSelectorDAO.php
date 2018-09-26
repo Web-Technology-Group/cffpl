@@ -93,4 +93,26 @@ class TeamSelectorDAO
             echo "An exception has occurred. ". $e->getMessage(). ". Please notify the help desk.";
         }
     }
+
+    /**
+     * Determine whether the user has selected their team.
+     * @param $username
+     * @return bool
+     */
+    public function isTeamSelected($username)
+    {
+        $result = false;
+
+        $dbPDOConnection = Database\DBConnection::getPDOInstance();
+
+        $statement = $dbPDOConnection->query(
+            "SELECT us.userid FROM usersquads us, users u WHERE u.username = '$username' AND u.id = us.userid AND us.inteam = 1");
+
+        // If the number of rows returned is greater than zero then return true, else return false.
+        if ($row = $statement->rowCount() > 0) {
+            $result = true;
+        }
+
+        return $result;
+    }
 }

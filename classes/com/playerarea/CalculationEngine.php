@@ -137,7 +137,8 @@ class CalculationEngine
                     }
                 }
 
-                return $userWeeklyScoreGrandTotal;
+                // Return a results array with the username, weekly points score, and for the given week
+                return array($username, $maxWeekValue, $userWeeklyScoreGrandTotal);
             }
         }
 

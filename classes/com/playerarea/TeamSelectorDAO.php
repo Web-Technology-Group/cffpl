@@ -126,12 +126,6 @@ class TeamSelectorDAO
 
         $playerNames = array();
 
-        // SELECT pp.name
-        //FROM premierplayers pp, usersquads us, users u
-        //WHERE u.username = 'mark.lupine@civica.co.uk'
-        //AND u.id = us.userid
-        //AND us.playerid = pp.id
-        //AND us.inteam = 1;
         $statement = $dbPDOConnection->query(
             "SELECT pp.name FROM premierplayers pp, usersquads us, users u ".
             "WHERE u.username = '$username' AND u.id = us.userid AND us.playerid = pp.id AND us.inteam = 1");
@@ -142,5 +136,30 @@ class TeamSelectorDAO
         }
 
         return $playerNames;
+    }
+
+    /**
+     * Check whether the team selection window is currently
+     */
+    public static function isTeamSelectionWindowOpen() {
+        // Get the current time
+        $currentDateTime = new \DateTime("now");
+
+        // Get all the dates from the weekly history table
+        $dbPDOConnection = Database\DBConnection::getPDOInstance();
+        $statement = $dbPDOConnection->query(
+            "SELECT weekstarttime, weekendtime FROM weeklyhistory");
+
+        $windowOpen = false;
+        while ($row = $statement->fetch()) {
+            $weekstarttime = new \DateTime($row['weekstarttime']);
+            $weekendtime = new \DateTime($row['weekendtime']);
+
+            if (($currentDateTime >= $weekstarttime) &&
+                ($currentDateTime <= $weekendtime)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

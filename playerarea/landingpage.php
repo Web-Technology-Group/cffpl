@@ -25,6 +25,8 @@ $isTeamSelected = $teamSelector->isTeamSelected($username);
 
 $leaderboardArray = PlayerArea\CalculationEngine::getLeaderboard();
 
+$teamSelectionWindowOpen =  PlayerArea\TeamSelectorDAO::isTeamSelectionWindowOpen();
+
 ?>
 
 <!DOCTYPE html>
@@ -42,14 +44,19 @@ $leaderboardArray = PlayerArea\CalculationEngine::getLeaderboard();
             <a href="squadselection1.php">Select Squad</a>
         <?php   } else {
 
-        // To Do:
-        // Only allow the user to select the team if the selection window is still open for the latest week
-        // Put something that hides this element if the window to select the team is not open
-        // i.e. if current time is after/before a certain time
+            if ($teamSelectionWindowOpen) {
 
-            ?>
-            <a href="teamselection1.php">Select Team</a>
-            <br/>
+            // To Do:
+            // Only allow the user to select the team if the selection window is still open for the latest week
+            // Put something that hides this element if the window to select the team is not open
+            // i.e. if current time is after/before a certain time
+
+                ?>
+                <a href="teamselection1.php">Select Team</a>
+                <br/>
+            <?php } ?>
+
+
             <?php if ($isTeamSelected) { ?>
                 <!-- Echo out the current team -->
                 <h4>The current team is:</h4><br/>

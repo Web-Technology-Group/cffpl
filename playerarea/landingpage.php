@@ -1,11 +1,12 @@
 <?php
 
-namespace PlayerArea;
+namespace View\PlayerArea;
 
-use Com\PlayerArea\Validation;
 use Com\PlayerArea;
 
 require_once('..\classes\com\playerarea\SquadSelectorDAO.php');
+require_once('..\classes\com\playerarea\TeamSelectorDAO.php');
+require_once('..\classes\com\playerarea\CalculationEngine.php');
 
 session_start();
 $username = $_SESSION['username'];
@@ -16,10 +17,10 @@ if (!$username) {
     header('Location: ../login.php');
 }
 
-$squadSelector = new Validation\SquadSelectorDAO();
+$squadSelector = new PlayerArea\SquadSelectorDAO();
 $isSquadSelected = $squadSelector->isSquadSelected($username);
 
-$teamSelector = new Validation\TeamSelectorDAO();
+$teamSelector = new PlayerArea\TeamSelectorDAO();
 $isTeamSelected = $teamSelector->isTeamSelected($username);
 
 $leaderboardArray = PlayerArea\CalculationEngine::getLeaderboard();
@@ -36,8 +37,8 @@ $leaderboardArray = PlayerArea\CalculationEngine::getLeaderboard();
     <h2>Player Area Home Page</h2><br>
 
     <h4>Welcome <?php echo $username ?>!</h4>
-    <br>
-    <h5><?php if (!$isSquadSelected) { ?>
+    <br />
+    <?php if (!$isSquadSelected) { ?>
             <a href="squadselection1.php">Select Squad</a>
         <?php   } else {
 
@@ -51,28 +52,26 @@ $leaderboardArray = PlayerArea\CalculationEngine::getLeaderboard();
             <br/>
             <?php if ($isTeamSelected) { ?>
                 <!-- Echo out the current team -->
+                <h4>The current team is:</h4><br/>
                 <?php
-                    $userTeam = $_SESSION['userTeam'];
-                    foreach ($userTeam as $player) { ?>
-                        <!-- This may be an id, so have to look up the actual player name if required -->
-                        <h4><? echo $player ?></h4> <br/>
+                    $playerNames = PlayerArea\TeamSelectorDAO::getPlayerInfoByUsername($username);
+                    foreach ($playerNames as $playerName) { ?>
+                        <?php echo $playerName ?>
                  <?php   }
             } ?>
 
-        <?php } ?></h5>
+        <?php } ?>
     <br/>
 
     <!-- Show the overall leader board and the user's position on that leader board i.e. with their total points -->
-    <?
+    <h4>Leaderboard<br/>
+    <?php
         $positionalCount = 1;
-        foreach ($leaderboardArray as $element) {
-            $userOnLeaderboard = $element[0]; // username
-            $userTotalPoints = $element[1]; // total points
-            echo "'$positionalCount') ". $userOnLeaderboard. " with total points=". $userTotalPoints. "<br/>";
-            $positionalCount++;
+        foreach ($leaderboardArray as $element => $value) {
+            echo $positionalCount. ") ". $value. " with total points: ". $element. "<br />";
+            $positionalCount = $positionalCount + 1;
         }
-
-        ?>
+    ?></h4>
     <!-- Maybe show the user's current team if selected -->
     <h5><a href="../logout.php">Logout</a></h5>
 

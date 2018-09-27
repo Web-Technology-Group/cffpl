@@ -1,6 +1,6 @@
 <?php
 
-namespace Com\PlayerArea\Validation;
+namespace Com\PlayerArea;
 
 use Com\PlayerArea\Database;
 
@@ -114,5 +114,33 @@ class TeamSelectorDAO
         }
 
         return $result;
+    }
+
+    /**
+     * Get the player information given the username i.e. the current team selected by the user
+     * @param $userTeam
+     */
+    public static function getPlayerInfoByUsername($username) {
+
+        $dbPDOConnection = Database\DBConnection::getPDOInstance();
+
+        $playerNames = array();
+
+        // SELECT pp.name
+        //FROM premierplayers pp, usersquads us, users u
+        //WHERE u.username = 'mark.lupine@civica.co.uk'
+        //AND u.id = us.userid
+        //AND us.playerid = pp.id
+        //AND us.inteam = 1;
+        $statement = $dbPDOConnection->query(
+            "SELECT pp.name FROM premierplayers pp, usersquads us, users u ".
+            "WHERE u.username = '$username' AND u.id = us.userid AND us.playerid = pp.id AND us.inteam = 1");
+
+        while ($row = $statement->fetch()) {
+            $name = $row[0];
+            array_push($playerNames, $name);
+        }
+
+        return $playerNames;
     }
 }

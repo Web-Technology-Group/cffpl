@@ -5,6 +5,7 @@ namespace Com\PlayerArea;
 use Com\PlayerArea\Database;
 
 require_once('database\DBConnection.php');
+require_once('CalculationEngineDAO.php');
 
 /**
  * Calculation Engine that calculates the following:
@@ -56,21 +57,26 @@ class CalculationEngine
                 // First establish what the latest week is
                 $statement = $dbPDOConnection->query("SELECT MAX(week) FROM premierplayers");
                 $maxWeekValue = 0;
-                while ($row = $statement->fetch()) {
+                if ($row = $statement->fetch()) {
                     $maxWeekValue = $row[0];
                 }
 
-                // Get all the points associated with the players selected in the team for the max week.
-                // Store the results in an array
+                // Sanity check, in case the user hasn't selected a team for the maximum week yet.
+                // Need to check that a team has been selected by the user for that week, if not then decrement the
+                // count to the previous week
+                $statement = $dbPDOConnection->query(
+                    "SELECT pp.id FROM premierplayers pp, usersquads us, users u WHERE pp.id = us.playerid ".
+                    "AND u.id = us.userid AND u.username ='$username' AND pp.week = '$maxWeekValue'");
+
+                // If there are no rows returned then try again after decrementing the count: i.e. the previous week
+                if (!($row = $statement->fetch())) {
+                    $maxWeekValue = $maxWeekValue - 1;
+                }
+
+                // Get all the points associated with the players selected in the team for the max week
+                // (or max week - 1). Store the results in an array
                 $latestWeekPlayerScores = array();
 
-                // SELECT pp.id, pp.name, pp.team, pp.points
-                // FROM premierplayers pp, usersquads us, users u
-                // WHERE us.inteam = 1
-                // AND pp.id = us.playerid
-                // AND u.id = us.userid
-                // AND u.username ='?'
-                //AND pp.week = '?';
                 $statement = $dbPDOConnection->query(
                     "SELECT pp.id, pp.name, pp.team, pp.points FROM premierplayers pp, usersquads us, users u ".
                     "WHERE us.inteam = 1 ".
@@ -78,24 +84,70 @@ class CalculationEngine
                     "AND u.id = us.userid ".
                     " AND u.username ='$username' AND pp.week = '$maxWeekValue'");
 
-                while ($row = $statement->fetch()) {
 
-                    $latestWeekPlayerScores[$row[0]] = array($row[1], $row[2], $row[3]);
+                while ($row = $statement->fetch()) {
+                    //die("id=". $row['id']. ", and name=". $row['name']. ", team=". $row['team']. " and points=". $row['points']);
+                    array_push($latestWeekPlayerScores, array($row['name'], $row['team'], $row['points']));
+
+                }
+
+                // Note, that if the maximum/requested week is already at 1, then there is no week '0'
+                if ($maxWeekValue == 1) {
+                    // Given that there is only the one week, take those player scores and calculate the
+                    // total for that given week
+                    $weeklyUserScore = 0;
+                    foreach ($latestWeekPlayerScores as $id => $nameTeamPoints) {
+                        $weeklyUserScore = $weeklyUserScore + $nameTeamPoints[2];
+                    }
+
+                    // Return a results array with the username, weekly points score, and for the given week
+                    return array($username, $maxWeekValue, $weeklyUserScore);
+
+                } else {
+
+                    $previousWeek = $maxWeekValue - 1;
+                    $userWeeklyScoreGrandTotal = 0;
+                    foreach ($latestWeekPlayerScores as $id => $nameTeamPoints) {
+                        // The player's name
+                        $playerName = $nameTeamPoints['name'];
+
+                        // The player's team
+                        $team = $nameTeamPoints['team'];
+
+                        // The points total for that player
+                        $points = $nameTeamPoints['points'];
+
+                        // Get the number of points for that particular player for the previous week
+                        $selectStatement = $dbPDOConnection->query(
+                            "SELECT DISTINCT pp.points, FROM premierplayers pp, usersquads us, users u ".
+                            "WHERE pp.name = ? AND  pp.team = ? AND u.id = us.userid AND u.username = ? ".
+                            "AND pp.week = ?");
+
+                        $selectStatement->execute([$playerName, $team, $username, $previousWeek]);
+
+                        // Get the value from the statement and work out the previous value
+                        while ($row = $selectStatement->fetch()) {
+                            $previousWeekPointsScore = $row['points']; // The points total for the previous week
+
+                            // The total for the latest/requested week
+                            $latestPointsScoreForPlayer =
+                                CalculationEngine::findPlayerPointsTotal($latestWeekPlayerScores, $playerName, $team);
+
+                            // The point change is therefore the latest points score minus the previous
+                            // weeks points score
+                            $weeklyPointsTotalForPlayer = $latestPointsScoreForPlayer - $previousWeekPointsScore;
+
+                            // Add this to the grand total weekly score i.e. the combined weekly score for those
+                            // selected players in the team
+                            $userWeeklyScoreGrandTotal += $weeklyPointsTotalForPlayer;
+                        }
+                    }
                 }
 
                 // Get all the previous week's points which were associated with the players selected
                 // before the maximum week itself.
                 // Store the results in an array
                 $previousWeekPlayerScores = array();
-
-                // SELECT DISTINCT pp.id, pp.name, pp.team, pp.points
-                //FROM premierplayers pp, usersquads us, users u
-                //WHERE pp.name = 'Vietto'
-                //AND pp.team = 'Fulham'
-                //-- AND pp.id = us.playerid
-                //AND u.id = us.userid
-                //AND u.username ='mark.lupine@civica.co.uk'
-                //AND pp.week = '2';
 
                 $weeklyPointsTotalForPlayer = 0;
                 $previousWeek = $maxWeekValue - 1;
@@ -167,15 +219,15 @@ class CalculationEngine
     }
 
 
-    public function generateAllUserWeeklyScores() {
+    public static function generateAndInsertAllUserWeeklyScores() {
 
         // For each user in the system calculate the weekly scores
         $dbPDOConnection = Database\DBConnection::getPDOInstance();
 
         $selectStatement = $dbPDOConnection->query("SELECT username FROM users");
         while ($row = $selectStatement->fetch()) {
-            $username = row[0]; // username
-            $weeklyScoreArray = calculateWeeklyUserScore($username, $week = null, $latestWeek = true);
+            $dataToInsert = CalculationEngine::calculateWeeklyUserScore($row['username'], null, true);
+            CalculationEngineDAO::insertUserWeeklyScoreEntry($dataToInsert);
 
         }
 

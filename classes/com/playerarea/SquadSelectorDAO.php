@@ -1,6 +1,6 @@
 <?php
 
-namespace Com\PlayerArea\Validation;
+namespace Com\PlayerArea;
 
 use Com\PlayerArea\Database;
 

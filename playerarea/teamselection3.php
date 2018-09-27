@@ -1,8 +1,8 @@
 <?php
 
-namespace PlayerArea;
+namespace View\PlayerArea;
 
-use Com\PlayerArea\Validation;
+use Com\PlayerArea;
 
 require_once('..\classes\com\playerarea\TeamSelectorDAO.php');
 require_once('..\classes\com\playerarea\TeamSelectorValidator.php');
@@ -16,10 +16,10 @@ if (!$username) {
     header('Location: ../login.php');
 }
 
-$teamSelector = new Validation\TeamSelectorDAO();
+$teamSelector = new PlayerArea\TeamSelectorDAO();
 $allMidfielders = $teamSelector->getAllTeamPlayersByPosition('M', $username);
 
-$validator = new Validation\TeamSelectorValidator();
+$validator = new PlayerArea\TeamSelectorValidator();
 
 // check that the form has been submitted
 if (isset($_POST['submit'])) {

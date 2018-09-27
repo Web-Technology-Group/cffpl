@@ -1,8 +1,8 @@
 <?php
 
-namespace PlayerArea;
+namespace View\PlayerArea;
 
-use Com\PlayerArea\Validation;
+use Com\PlayerArea;
 
 require_once('..\classes\com\playerarea\SquadSelectorDAO.php');
 require_once('..\classes\com\playerarea\SquadSelectorValidator.php');
@@ -16,10 +16,10 @@ if (!$username) {
     header('Location: ../login.php');
 }
 
-$squadSelector = new Validation\SquadSelectorDAO();
+$squadSelector = new PlayerArea\SquadSelectorDAO();
 $allGKs = $squadSelector->getAllSquadPlayersByPosition('G');
 
-$validator = new Validation\SquadSelectorValidator();
+$validator = new PlayerArea\SquadSelectorValidator();
 
 // check that the form has been submitted
 if (isset($_POST['submit'])) {

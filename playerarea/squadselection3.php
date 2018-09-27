@@ -1,8 +1,8 @@
 <?php
 
-namespace PlayerArea;
+namespace View\PlayerArea;
 
-use Com\PlayerArea\Validation;
+use Com\PlayerArea;
 
 require_once('..\classes\com\playerarea\SquadSelectorDAO.php');
 require_once('..\classes\com\playerarea\SquadSelectorValidator.php');
@@ -16,7 +16,7 @@ if (!$username) {
     header('Location: ../login.php');
 }
 
-$squadSelector = new Validation\SquadSelectorDAO();
+$squadSelector = new PlayerArea\SquadSelectorDAO();
 $allGKs = $squadSelector->getAllSquadPlayersByPosition('M');
 
 // Get the stauts so far
@@ -27,7 +27,7 @@ $userSquad = $_SESSION['userSquad'];
 if (isset($_POST['submit'])) {
 
     // Create a validator object that validates the midfielders squad form submission
-    $validator = new Validation\SquadSelectorValidator();
+    $validator = new PlayerArea\SquadSelectorValidator();
     $errors = $validator->validateMidfieldersSquadForm($_POST);
 }
 

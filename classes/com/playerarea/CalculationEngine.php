@@ -86,7 +86,6 @@ class CalculationEngine
 
 
                 while ($row = $statement->fetch()) {
-                    //die("id=". $row['id']. ", and name=". $row['name']. ", team=". $row['team']. " and points=". $row['points']);
                     array_push($latestWeekPlayerScores, array($row['name'], $row['team'], $row['points']));
 
                 }
@@ -108,22 +107,23 @@ class CalculationEngine
                     $previousWeek = $maxWeekValue - 1;
                     $userWeeklyScoreGrandTotal = 0;
                     foreach ($latestWeekPlayerScores as $id => $nameTeamPoints) {
+
                         // The player's name
-                        $playerName = $nameTeamPoints['name'];
+                        $playerName = $nameTeamPoints[0];
 
                         // The player's team
-                        $team = $nameTeamPoints['team'];
+                        $team = $nameTeamPoints[1];
 
                         // The points total for that player
-                        $points = $nameTeamPoints['points'];
+                        $points = $nameTeamPoints[2];
 
                         // Get the number of points for that particular player for the previous week
                         $selectStatement = $dbPDOConnection->query(
-                            "SELECT DISTINCT pp.points, FROM premierplayers pp, usersquads us, users u ".
-                            "WHERE pp.name = ? AND  pp.team = ? AND u.id = us.userid AND u.username = ? ".
-                            "AND pp.week = ?");
+                            "SELECT DISTINCT pp.points FROM premierplayers pp, usersquads us, users u ".
+                            "WHERE pp.name = '$playerName' AND  pp.team = '$team' AND u.id = us.userid AND u.username = '$username' ".
+                            "AND pp.week = '$previousWeek'");
 
-                        $selectStatement->execute([$playerName, $team, $username, $previousWeek]);
+                        // $selectStatement->execute([$playerName, $team, $username, $previousWeek]);
 
                         // Get the value from the statement and work out the previous value
                         while ($row = $selectStatement->fetch()) {
@@ -164,11 +164,11 @@ class CalculationEngine
 
                     // Get the number of points for that particular player for the previous week
                     $selectStatement = $dbPDOConnection->query(
-                        "SELECT DISTINCT pp.points, FROM premierplayers pp, usersquads us, users u ".
-                                  "WHERE pp.name = ? AND  pp.team = ? AND u.id = us.userid AND u.username = ? ".
-                                  "AND pp.week = ?");
+                        "SELECT DISTINCT pp.points FROM premierplayers pp, usersquads us, users u ".
+                                  "WHERE pp.name = '$playerName' AND  pp.team = '$team' AND u.id = us.userid AND u.username = '$username' ".
+                                  "AND pp.week = '$previousWeek'");
 
-                    $selectStatement->execute([$playerName, $team, $username, $previousWeek]);
+                    //$selectStatement->execute([$playerName, $team, $username, $previousWeek]);
 
                     // Get the value from the statement and work out the previous value
                     while ($row = $selectStatement->fetch()) {
@@ -205,7 +205,7 @@ class CalculationEngine
             "SELECT u.username, FORMAT(SUM(weekpointstotal), 2) AS total FROM userweeklyscores uws, users u ".
             "WHERE uws.userid = u.id ".
             "GROUP BY username ".
-            "ORDER BY FORMAT(SUM(weekpointstotal), 2) DESC");
+            "ORDER BY FORMAT(SUM(weekpointstotal), 2) ASC");
 
         $leaderboard = array();
         while ($row = $selectStatement->fetch()) {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Com\PlayerArea\Validation;
+namespace Com\PlayerArea;
 
 class SquadSelectorValidator
 {

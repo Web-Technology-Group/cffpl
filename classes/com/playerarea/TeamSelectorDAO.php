@@ -48,9 +48,21 @@ class TeamSelectorDAO
                         " AND u.username ='$username' AND pp.week = 1");
 
             // Build the result array to contain the relevant fields used in the front end
-            while ($row = $statement->fetch()) {
+            if ($row = $statement->fetch()) {
 
                 $allAvailableTeamPlayers[$row[0]] = array($row[1], $row[2], $row[3]);
+
+            } else {
+                $statement = $dbPDOConnection->query(
+                    "SELECT pp.id, pp.name, pp.team, pp.points FROM premierplayers pp, usersquads us, users u ".
+                    "WHERE position = '$position' AND pp.id = us.playerid AND u.id = us.userid".
+                    " AND u.username ='$username'");
+
+                while ($row = $statement->fetch()) {
+
+                    $allAvailableTeamPlayers[$row[0]] = array($row[1], $row[2], $row[3]);
+
+                }
             }
 
             return $allAvailableTeamPlayers;

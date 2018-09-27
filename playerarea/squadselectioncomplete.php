@@ -1,8 +1,8 @@
 <?php
 
-namespace PlayerArea;
+namespace View\PlayerArea;
 
-use Com\PlayerArea\Validation;
+use Com\PlayerArea;
 
 require_once('..\classes\com\playerarea\SquadSelectorDAO.php');
 
@@ -15,7 +15,7 @@ if (!$username) {
     header('Location: ../login.php');
 }
 
-$squadSelectorDAO = new Validation\SquadSelectorDAO();
+$squadSelectorDAO = new PlayerArea\SquadSelectorDAO();
 $squadSelectorDAO->submitSquad($username);
 
 ?>
